@@ -61,6 +61,7 @@ const trail = [];
 let simulationTimeSeconds = 0;
 let accumulator = 0;
 let previousTimeSeconds = performance.now() / 1000;
+let crashed = false;
 
 function resizeCanvas() {
   const dpr = window.devicePixelRatio || 1;
@@ -190,11 +191,18 @@ function resetToCircularOrbit() {
 
   simulationTimeSeconds = 0;
   accumulator = 0;
+  crashed = false;
   speedSlider.value = "1.00";
   speedFactorValue.textContent = "1.00x";
 
   resetTrail();
   updateTelemetry();
+  previousTimeSeconds = performance.now() / 1000;
+  requestAnimationFrame(frame);
+}
+
+function checkCrash() {
+  return Math.hypot(satellite.position.x, satellite.position.y) <= EARTH_RADIUS;
 }
 
 function stepPhysics() {
@@ -214,6 +222,10 @@ function stepPhysics() {
   trail.push({ x: satellite.position.x, y: satellite.position.y });
   if (trail.length > TRAIL_MAX_POINTS) {
     trail.shift();
+  }
+
+  if (checkCrash()) {
+    crashed = true;
   }
 }
 
@@ -254,12 +266,29 @@ function drawScene(alpha) {
   const satelliteX = lerp(satellite.previousPosition.x, satellite.position.x, alpha);
   const satelliteY = lerp(satellite.previousPosition.y, satellite.position.y, alpha);
 
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = crashed ? "#ff4444" : "#fff";
   drawFilledCircle(
     satelliteX,
     satelliteY,
     SATELLITE_RADIUS_PX / METERS_TO_PIXELS
   );
+}
+
+function drawCrashOverlay() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.fillStyle = "rgba(255, 60, 60, 0.18)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.font = `bold ${Math.round(canvas.width * 0.035)}px "IBM Plex Sans", "Segoe UI", sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillStyle = "rgba(255, 80, 80, 0.9)";
+  ctx.fillText("IMPACT — SATELLITE CRASHED", canvas.width / 2, canvas.height / 2);
+
+  const sub = Math.round(canvas.width * 0.018);
+  ctx.font = `${sub}px "IBM Plex Sans", "Segoe UI", sans-serif`;
+  ctx.fillStyle = "rgba(255, 180, 180, 0.7)";
+  ctx.fillText("Press ↺ to reset", canvas.width / 2, canvas.height / 2 + sub * 2.4);
 }
 
 function frame() {
@@ -286,8 +315,13 @@ function frame() {
   }
 
   drawScene(accumulator / DT);
+  if (crashed) {
+    drawCrashOverlay();
+  }
   updateTelemetry();
-  requestAnimationFrame(frame);
+  if (!crashed) {
+    requestAnimationFrame(frame);
+  }
 }
 
 const hudToggle = document.getElementById("hud-toggle");
