@@ -20,10 +20,11 @@ Rules:
 - CSS must always be in `/styles.css` (no inline `<style>` blocks, no style attributes)
 - JavaScript must be in module files (no inline `<script>` logic other than module import wiring)
 - No additional directories for Step 1
+- Overlay UI for later steps is allowed, but it must remain lightweight and be declared explicitly in the guide for that step
 
 ## Separation of Concerns
 
-- `index.html`: structure only (canvas and script/css links)
+- `index.html`: structure only (canvas, optional overlay controls/readouts, script/css links)
 - `styles.css`: visual styling only
 - `main.js`: app bootstrap, animation loop orchestration
 - `physics.js` (optional): gravity and integrator logic
@@ -51,6 +52,7 @@ Rules:
 ## Rendering Rules
 
 - Canvas rendering only
+- Later-step controls and telemetry may use DOM overlay elements outside the canvas
 - Center-origin coordinate system must be explicit and consistent
 - Clear canvas every frame before draw calls
 - Draw order must be stable: background, Earth, trail (if any), satellite
@@ -93,7 +95,7 @@ Do not hardcode these values in multiple files.
 
 ## HTML and CSS Baseline
 
-- `index.html` includes only essentials: charset, viewport, title, stylesheet link, canvas, module script
+- `index.html` includes only essentials: charset, viewport, title, stylesheet link, canvas, optional step-specific overlay controls/readouts, module script
 - `styles.css` sets:
   - black page/canvas background
   - no scrollbars

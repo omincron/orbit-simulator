@@ -16,9 +16,8 @@ Priorities:
 - Deterministic behavior
 
 Non-goals:
-- UI
 - Frameworks
-- Visual embellishments
+- Visual embellishments beyond what is explicitly required per step
 
 ## Strict Constraints
 
@@ -221,6 +220,38 @@ Expected Step 1.5 behavior:
 - Better long-duration orbit quality versus naive explicit Euler stepping
 - Stable real-time behavior under moderate frame jitter
 
+## Step 2 Interaction And Telemetry
+
+Step 2 introduces lightweight on-screen controls and telemetry so users can actively change orbital speed and immediately observe the resulting trajectory.
+
+Required Step 2 additions:
+- Add a minimal control overlay in HTML/CSS
+- Add a speed control input with deterministic bounds:
+  - minimum factor: `0.6x`
+  - maximum factor: `1.4x`
+  - default factor: `1.0x`
+- Speed control changes the tangential velocity magnitude while keeping the current orbital position
+- Add a reset action that restores the initial circular orbit state
+- Add on-screen telemetry showing at minimum:
+  - current speed
+  - current altitude above Earth surface
+  - current radius from Earth center
+  - local circular speed at current radius
+  - current speed-to-circular-speed ratio
+  - elapsed simulation time
+
+Implementation rules for Step 2:
+- Physics remains fixed-step and deterministic between user interactions
+- Control inputs must update simulation state explicitly, not through hidden side effects
+- Telemetry may be rendered as DOM overlay text
+- Canvas remains the orbital view; controls and readouts must not affect physics calculations
+- When speed changes manually, reset the orbit trail so the trajectory change is visually attributable to the new condition
+
+Expected Step 2 behavior:
+- Lowering speed produces a more inward, lower-energy path
+- Raising speed produces a wider path and may produce escape-like behavior if high enough
+- Telemetry updates continuously and matches the visible motion
+
 ## Implementation Process Log
 
 This section records the implementation process so future contributors can reproduce decisions and avoid prior mistakes.
@@ -240,6 +271,12 @@ This section records the implementation process so future contributors can repro
 - Added `TIME_SCALE = 60` to keep orbit motion visible in real time
 - Added interpolation using previous/current position for smooth rendering
 - Updated accumulator overload handling to preserve bounded remainder time
+
+4. Step 2 controls and telemetry:
+- Added DOM overlay controls for live speed adjustment and reset
+- Added on-screen telemetry for speed, altitude, radius, circular speed, ratio, and simulation time
+- Defined speed changes as tangential velocity rescaling at the current orbital position
+- Reset trail on speed changes so orbit transitions remain readable
 
 ## Deliverable
 

@@ -5,6 +5,8 @@ body {
   height: 100%;
   overflow: hidden;
   background: #000;
+  color: #f5f7fb;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
 #sim-canvas {
@@ -12,4 +14,91 @@ body {
   width: 100vw;
   height: 100vh;
   background: #000;
+}
+
+.hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  display: grid;
+  gap: 12px;
+  width: min(320px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+.panel {
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  background: rgba(7, 12, 24, 0.78);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+}
+
+.panel h1,
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  font-size: 0.92rem;
+}
+
+#speed-slider {
+  width: 100%;
+  margin: 0 0 12px;
+  accent-color: #6db7ff;
+}
+
+#reset-button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(109, 183, 255, 0.4);
+  border-radius: 10px;
+  background: rgba(109, 183, 255, 0.14);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+#reset-button:hover {
+  background: rgba(109, 183, 255, 0.22);
+}
+
+.telemetry-panel dl {
+  margin: 0;
+}
+
+.telemetry-panel div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+.telemetry-panel dt {
+  color: rgba(245, 247, 251, 0.7);
+}
+
+.telemetry-panel dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 640px) {
+  .hud {
+    top: 12px;
+    left: 12px;
+    width: min(300px, calc(100vw - 24px));
+  }
 }

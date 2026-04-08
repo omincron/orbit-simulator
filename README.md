@@ -54,6 +54,12 @@ Step 1.5 refines runtime quality while preserving deterministic fixed-step physi
 - fixed-step accumulator with interpolation rendering
 - explicit simulation time scaling for observable motion
 
+Step 2 adds user-facing observation tools:
+
+- a speed control slider to raise or lower orbital speed
+- a reset action to restore the starting circular orbit
+- on-screen telemetry for speed, altitude, radius, orbit ratio, and simulation time
+
 ## Documentation Policy
 
 Implementation changes must be documented in the project guide files as part of the same work, including what changed, why, and how it affects physics or determinism.

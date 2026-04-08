@@ -8,6 +8,36 @@
   </head>
   <body>
     <canvas id="sim-canvas" aria-label="2D orbit simulation"></canvas>
+    <section class="hud" aria-label="Simulation controls and telemetry">
+      <div class="panel controls-panel">
+        <h1>Orbit Controls</h1>
+        <label class="control-row" for="speed-slider">
+          <span>Speed Multiplier</span>
+          <output id="speed-factor-value" for="speed-slider">1.00x</output>
+        </label>
+        <input
+          id="speed-slider"
+          type="range"
+          min="0.6"
+          max="1.4"
+          step="0.01"
+          value="1.00"
+        />
+        <button id="reset-button" type="button">Reset To Circular Orbit</button>
+      </div>
+
+      <div class="panel telemetry-panel">
+        <h2>Telemetry</h2>
+        <dl>
+          <div><dt>Speed</dt><dd id="speed-readout">0 km/s</dd></div>
+          <div><dt>Altitude</dt><dd id="altitude-readout">0 km</dd></div>
+          <div><dt>Radius</dt><dd id="radius-readout">0 km</dd></div>
+          <div><dt>Circular Speed</dt><dd id="circular-speed-readout">0 km/s</dd></div>
+          <div><dt>Orbit Ratio</dt><dd id="orbit-ratio-readout">0.00x</dd></div>
+          <div><dt>Sim Time</dt><dd id="sim-time-readout">0 min</dd></div>
+        </dl>
+      </div>
+    </section>
     <script type="module" src="./main.js"></script>
   </body>
 </html>
