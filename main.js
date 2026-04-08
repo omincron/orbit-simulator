@@ -4,8 +4,9 @@ const EARTH_MASS = 5.972e24;  // Earth mass              (kg)
 const EARTH_RADIUS = 6.371e6; // Earth mean radius       (m)  — display only
 
 // ── Simulation timestep ───────────────────────────────────────────────────────
-// dt = 10 s gives smooth Euler integration at LEO speeds (~7800 m/s).
-const DT = 10;                // seconds per physics step
+// Step 1.5: use a smaller fixed dt for better orbital stability.
+const DT = 1;                 // seconds per physics step
+const TIME_SCALE = 60;        // simulation seconds per real second
 const R_MIN = 1e3;            // minimum radius clamp    (m)  — prevents ÷0
 
 // ── Rendering ─────────────────────────────────────────────────────────────────
@@ -16,7 +17,7 @@ const EARTH_RADIUS_PX  = Math.max(2, EARTH_RADIUS * METERS_TO_PIXELS);
 const SATELLITE_RADIUS_PX = 3;
 
 // ── Loop limits ───────────────────────────────────────────────────────────────
-const MAX_STEPS_PER_FRAME = 5;
+const MAX_STEPS_PER_FRAME = 12;
 const TRAIL_MAX_POINTS    = 2000;
 
 // ── Initial conditions: circular LEO at ~400 km altitude ─────────────────────
@@ -34,6 +35,7 @@ if (!ctx) {
 // Top-down view: +x → right (east), +y → up (north), origin = Earth centre.
 // Satellite starts on the +x axis moving tangentially in the +y direction.
 const satellite = {
+  previousPosition: { x: ORBIT_RADIUS, y: 0 },
   position: { x: ORBIT_RADIUS, y: 0 },
   velocity: { x: 0, y: ORBITAL_SPEED }
 };
@@ -80,8 +82,12 @@ function assertFiniteState() {
 }
 
 function stepPhysics() {
+  satellite.previousPosition.x = satellite.position.x;
+  satellite.previousPosition.y = satellite.position.y;
+
   const acceleration = computeGravityAcceleration(satellite.position);
 
+  // Semi-implicit Euler (symplectic Euler): better long-term orbital behavior.
   satellite.velocity.x += acceleration.x * DT;
   satellite.velocity.y += acceleration.y * DT;
 
@@ -102,7 +108,11 @@ function drawFilledCircle(x, y, radiusPx) {
   ctx.fill();
 }
 
-function drawScene() {
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+
+function drawScene(alpha) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = "#000";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -130,11 +140,14 @@ function drawScene() {
     ctx.stroke();
   }
 
+  const satelliteX = lerp(satellite.previousPosition.x, satellite.position.x, alpha);
+  const satelliteY = lerp(satellite.previousPosition.y, satellite.position.y, alpha);
+
   // Satellite — bright white dot.
   ctx.fillStyle = "#fff";
   drawFilledCircle(
-    satellite.position.x,
-    satellite.position.y,
+    satelliteX,
+    satelliteY,
     SATELLITE_RADIUS_PX / METERS_TO_PIXELS
   );
 }
@@ -151,7 +164,10 @@ function frame() {
     frameDelta = 0;
   }
 
-  accumulator += frameDelta;
+  // Clamp unusually long frames (tab switch, debugger pause) to keep stepping sane.
+  frameDelta = Math.min(frameDelta, 0.25);
+
+  accumulator += frameDelta * TIME_SCALE;
 
   let steps = 0;
   while (accumulator >= DT && steps < MAX_STEPS_PER_FRAME) {
@@ -160,11 +176,12 @@ function frame() {
     steps += 1;
   }
 
-  if (steps === MAX_STEPS_PER_FRAME && accumulator > DT) {
-    accumulator = 0;
+  if (steps === MAX_STEPS_PER_FRAME && accumulator >= DT) {
+    accumulator = DT - 1e-9;
   }
 
-  drawScene();
+  const alpha = accumulator / DT;
+  drawScene(alpha);
   requestAnimationFrame(frame);
 }
 

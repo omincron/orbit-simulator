@@ -1,6 +1,9 @@
-# Step 1: Minimal 2D Orbit Simulator (Vanilla JavaScript)
+# Orbit Simulator — Simulation Guide
 
-This specification must be used together with `IMPLEMENTATION_CONSISTENCY_GUIDELINES.md`.
+This file is the single growing reference for all implementation steps.
+Each step is documented in sequence so contributors can follow the full build process.
+
+This guide must be used together with `IMPLEMENTATION_CONSISTENCY_GUIDELINES.md`.
 If there is any ambiguity, follow both documents and choose the stricter constraint.
 
 ## Objective
@@ -191,6 +194,52 @@ Do not implement:
 - Use clear variable names
 - Keep math readable and direct
 - Use console logging only for debugging when needed
+
+## Step 1.5 Refinement Profile
+
+Step 1.5 keeps Step 1 constraints (single page, canvas only, deterministic fixed-step physics) while improving simulation quality and readability.
+
+Required Step 1.5 changes:
+- Integrator: use semi-implicit Euler (symplectic Euler)
+  - `vx += ax * dt`
+  - `vy += ay * dt`
+  - `x += vx * dt`
+  - `y += vy * dt`
+- Fixed physics step: `dt = 1` second
+- Add explicit simulation speed control: `TIME_SCALE = 60`
+  - Meaning: 60 simulation seconds advance per real second
+- Keep accumulator fixed-step loop with step cap
+  - Use `MAX_STEPS_PER_FRAME = 12`
+  - If overloaded, keep a bounded remainder instead of zeroing all accumulated time
+- Render interpolation:
+  - Keep previous and current physics positions
+  - Interpolate rendered position with `alpha = accumulator / dt`
+  - Trail sampling must still occur only on physics steps
+
+Expected Step 1.5 behavior:
+- Smoother apparent motion without changing deterministic fixed-step physics
+- Better long-duration orbit quality versus naive explicit Euler stepping
+- Stable real-time behavior under moderate frame jitter
+
+## Implementation Process Log
+
+This section records the implementation process so future contributors can reproduce decisions and avoid prior mistakes.
+
+1. Baseline setup:
+- Created root files: `/index.html`, `/styles.css`, `/main.js`
+- Added deterministic fixed-step simulation loop and minimal canvas rendering
+
+2. Correctness fix (units and viewpoint):
+- Identified mismatch between SI constants and placeholder initial values
+- Standardized top-down x-y orbital view with Earth at origin
+- Switched to physically consistent LEO initial conditions in SI units
+- Added guide warnings against placeholder values like `(300, 0)` and `(0, 2)` with SI constants
+
+3. Step 1.5 refinement:
+- Reduced fixed step to `dt = 1` for better integration quality
+- Added `TIME_SCALE = 60` to keep orbit motion visible in real time
+- Added interpolation using previous/current position for smooth rendering
+- Updated accumulator overload handling to preserve bounded remainder time
 
 ## Deliverable
 

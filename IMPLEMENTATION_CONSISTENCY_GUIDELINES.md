@@ -117,3 +117,22 @@ Do not hardcode these values in multiple files.
 - Add new capabilities only behind explicit step requirements
 - Preserve existing constants and defaults unless change is requested
 - Document any intentional deviation from Step 1 spec in PR/commit notes
+
+## Documentation Requirement
+
+For every non-trivial implementation change, update the relevant guide file in the same change set so future contributors can follow both what changed and why.
+
+Minimum documentation updates per change:
+- What was changed
+- Why it was changed
+- Constants or formulas introduced or modified
+- Any deterministic-loop or numerical-stability implications
+
+## Process Traceability
+
+Maintain a chronological process log section in the simulation guide (`SIMULATION_GUIDE.md`) with concise entries describing:
+- baseline implementation
+- correctness fixes
+- refinement steps (for example Step 1.5)
+
+The log should be short, technical, and specific enough for a new contributor to reconstruct the implementation path.
