@@ -290,6 +290,13 @@ function frame() {
   requestAnimationFrame(frame);
 }
 
+const hudToggle = document.getElementById("hud-toggle");
+const hudDrawer = document.getElementById("hud-drawer");
+
+if (!hudToggle || !hudDrawer) {
+  throw new Error("Required HUD toggle elements are missing.");
+}
+
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
@@ -299,6 +306,12 @@ speedSlider.addEventListener("input", (event) => {
 
 resetButton.addEventListener("click", () => {
   resetToCircularOrbit();
+});
+
+hudToggle.addEventListener("click", () => {
+  const isExpanded = hudToggle.getAttribute("aria-expanded") === "true";
+  hudToggle.setAttribute("aria-expanded", String(!isExpanded));
+  hudDrawer.hidden = isExpanded;
 });
 
 resetToCircularOrbit();

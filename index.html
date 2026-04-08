@@ -9,25 +9,27 @@
   <body>
     <canvas id="sim-canvas" aria-label="2D orbit simulation"></canvas>
     <section class="hud" aria-label="Simulation controls and telemetry">
-      <div class="panel controls-panel">
-        <h1>Orbit Controls</h1>
-        <label class="control-row" for="speed-slider">
-          <span>Speed Multiplier</span>
+
+      <!-- Always-visible compact bar -->
+      <div class="panel hud-bar">
+        <div class="hud-bar-row">
+          <input
+            id="speed-slider"
+            type="range"
+            min="0.6"
+            max="1.4"
+            step="0.01"
+            value="1.00"
+            aria-label="Speed multiplier"
+          />
           <output id="speed-factor-value" for="speed-slider">1.00x</output>
-        </label>
-        <input
-          id="speed-slider"
-          type="range"
-          min="0.6"
-          max="1.4"
-          step="0.01"
-          value="1.00"
-        />
-        <button id="reset-button" type="button">Reset To Circular Orbit</button>
+          <button id="reset-button" type="button" title="Reset to circular orbit">↺</button>
+          <button id="hud-toggle" type="button" aria-expanded="false" title="Show telemetry">▾</button>
+        </div>
       </div>
 
-      <div class="panel telemetry-panel">
-        <h2>Telemetry</h2>
+      <!-- Collapsible telemetry + extended controls -->
+      <div class="panel telemetry-panel" id="hud-drawer" hidden>
         <dl>
           <div><dt>Speed</dt><dd id="speed-readout">0 km/s</dd></div>
           <div><dt>Altitude</dt><dd id="altitude-readout">0 km</dd></div>
@@ -37,6 +39,7 @@
           <div><dt>Sim Time</dt><dd id="sim-time-readout">0 min</dd></div>
         </dl>
       </div>
+
     </section>
     <script type="module" src="./main.js"></script>
   </body>
